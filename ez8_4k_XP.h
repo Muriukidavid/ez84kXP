@@ -35,7 +35,9 @@ typedef struct {
 	almlst:1,
 	almhen:1,
 	almlen:1,
-	bufmode:3;
+	bufmode2:1,
+	bufmode1:1,
+	bufmode0:1;
 }ADCCTL1;
 
 //type adc
@@ -178,16 +180,53 @@ typedef struct {
 	volatile REG irqctl;
 }*INTERRUPT_CONTROLLER;
 
+//watchdog timer
+typedef struct {
+	volatile REG wdctl;//rststat; reset status as well as timer control
+	volatile REG wdtu;
+	volatile REG wdth;
+	volatile REG wdtl;
+}*WATCHDOG_TIMER;
+
+//Flash Memory Controller
+typedef struct{
+	volatile REG fctl;//fstat; flash control as well as flash status same address
+	volatile REG fps;//fprot; flash page select as well as flash sector protect same address
+	volatile REG ffreqh;
+	volatile REG ffreql;
+}*FLASH_MEMORY_CONTROLLER;
+//eZ8 CPU
+typedef struct{
+	volatile unsigned char 
+	tram:1,
+	reserved:2,
+	vbo:1,
+	temp:1,
+	adc:1,
+	comp:1,
+	reserved1:1;
+}*POWER_CONTROLLER;
+
+//eZ8 CPU
+typedef struct {
+	volatile REG flags;
+	volatile REG rp;//register pointer
+	volatile REG sph;//stack pointer high byte
+	volatile REG spl;//stack pointer low byte
+}*CPU;
+
 //main struct
 typedef struct {
+	CPU cpu;
 	GPIO gpio;
 	INTERRUPT_CONTROLLER interrupt_c0;
 	UART uart0;
-	ADC adc0;	
+	ADC adc0;
+	WATCHDOG_TIMER watchdog0;
+	FLASH_MEMORY_CONTROLLER flash_mc0;
+	POWER_CONTROLLER power;
 } ez8XP4k;
 
-static ez8XP4k ez8;
-void construct_ez8(){
-	;//functions for initialization of ez8XP4k have been moved to respective .h files, nothing to do here.
-}
+ez8XP4k ez8;
+
 #endif 

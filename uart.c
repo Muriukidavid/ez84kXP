@@ -1,24 +1,31 @@
 #include "uart.h"
 
-unsigned int BRG0;
-//char myreg=0x00;
 void construct_uart(void){
-	//uart bind
 	ez8.uart0=(UART)uart;
 }
 
 void init_uart(){
+	#ifdef UART_R_INTERRUPTS 
 	SET_VECTOR(uart0_rx, ISR_Receive); //defining ISR for receive
-	//SET_VECTOR(uart0_tx, ISR_Transmit);
-	BRG0 = ez8_freq/BAUDRATE;//(unsigned int)36;
+	#endif
+	#ifdef UART_T_INTERRUPTS
+	SET_VECTOR(uart0_tx, ISR_Transmit);
+	#endif
+	
+	BRG0 = ez8_freq/BAUDRATE;
 	BRG0 = BRG0/16;	
 
 	ez8.uart0->control0.stopbits=stpbits;	//transmission stop bits
 	ez8.uart0->control0.ten=ON;				//transmitter enable
 	ez8.uart0->control0.ren=ON;				//receiver enable
-	ez8.uart0->control1.byte_reg=0x00;		// multiprosessor mode config byte all disabled
 	
-		//transmission parity
+	#ifdef UART_MULTIPROCESSOR
+		//TBD - to be done**
+	#else
+	ez8.uart0->control1.byte_reg=0x00;		// multiprosessor mode config byte all disabled
+	#endif
+	
+	//parity
 	if(parity==none){
 		ez8.uart0->control0.pen=0;
 	}
@@ -36,6 +43,7 @@ void init_uart(){
 	//write the baudrate in the registers
 	ez8.uart0->baudh.byte_reg = (unsigned int)((BRG0 & 0xFF00)>>8);
 	ez8.uart0->baudl.byte_reg = (unsigned int)((BRG0 & 0x00FF) & 0x00FF);
+	
 }
 
 void init_meter(void){//addresses for slaves 
@@ -61,12 +69,12 @@ void send(char data){
 
 //void receive(char *r_buffer){
 void receive(void){
-	x = ez8.uart0->data.byte_reg;
+	x = (int)(ez8.uart0->data.byte_reg);
 	send(x);
 }
 
 char read(void){
-return ez8.uart0->data.byte_reg;
+	return ez8.uart0->data.byte_reg;
 }
 
 char get_bufferlen(char *buffer){

@@ -9,6 +9,9 @@
 <file filter-key="">.\delay.c</file>
 <file filter-key="">.\interrupts.c</file>
 <file filter-key="">.\adc.c</file>
+<file filter-key="">.\lcd.c</file>
+<file filter-key="">.\watchdog.c</file>
+<file filter-key="">.\memory.c</file>
 </files>
 
 <!-- configuration information -->
