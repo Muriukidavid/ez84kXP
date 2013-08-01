@@ -202,7 +202,7 @@ typedef struct{
 	reserved:2,
 	vbo:1,
 	temp:1,
-	adc:1,
+	adc_p:1,// adc conflicts with adc address definition, rename to adc_p ;-)
 	comp:1,
 	reserved1:1;
 }*POWER_CONTROLLER;

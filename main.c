@@ -52,9 +52,10 @@ void init_system(){
 	init_interrupts(); 
 	init_watchdog();
 	//power configurations for stop mode
-	ez8.power->adc=ON;
+	ez8.power->adc_p=ON;//adc is on
 	ez8.power->tram=OFF;
 	ez8.power->temp=OFF;
+	ez8.power->comp=OFF;
 }
 
 void display(void){
