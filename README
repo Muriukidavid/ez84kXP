@@ -30,4 +30,7 @@ meter.lod            4066
 
 Build succeeded.
 
+Out of memory(negative unused memory), we can only test the devices one after the other, adcs can be tested together with the LCD. This is the end of the road for the 4K chip.
+Next move: to the 64K chip, very few changes ;)
+
 
