@@ -1,5 +1,33 @@
 
 Using the zilog ez8 XP 4K as a low end microcontroller to develop a portable C library, 4Kb is a nice mark for this :-)
 
+Current build output:
+
+------- test  Configuration: Debug -------
+src\main.c
+src\gpio.c
+src\delay.c
+src\timer.c
+src\lcd.c
+src\uart.c
+src\adc.c
+src\interrupts.c
+Linking...
+
+SPACE ALLOCATION:
+=================
+
+Space                     Base         Top      Size      Used    Unused
+------------------ ----------- ----------- --------- --------- ---------
+EDATA                   E:0100      E:044B       768       844       -76
+RDATA                     R:20        R:EF       224        17       207
+ROM                     C:0000      C:16B0      4096      5809     -1713
+
+OUTPUT CHECKSUM
+===============
+meter.hex            4066
+meter.lod            4066
+
+Build succeeded.
 
 

@@ -1,15 +1,14 @@
 #include "adc.h"
-int ADC_data=0x00;
 
 void construct_adc(void){
-	ez8.adc0=(ADC)adc;
+	ez8.adc=(ADC)adc0;
 }
 
 void init_adc(void){
 	#ifdef ADC_INTERRUPTS
 	SET_VECTOR(adc_vec, isr_ADC);
 	#endif
-	ez8.adc0->ctl1.refselh=OFF;//reset default value of this bit
+	ez8.adc->ctl1.refselh=OFF;//reset default value of this bit
 	/* Input Buffer Mode Select: BUFMODE[2:0] 
 	 000 = Single-ended, unbuffered input
 	 001 = Single-ended, buffered input with unity gain
@@ -18,21 +17,21 @@ void init_adc(void){
 	 111 = Differential, buffered input with 20x gain
 	*/
 	#ifdef DIFFERENTIAL
-	 ez8.adc0->ctl1.bufmode2=ON;
+	 ez8.adc->ctl1.bufmode2=ON;
 	#else
-	 ez8.adc0->ctl1.bufmode2=OFF;
+	 ez8.adc->ctl1.bufmode2=OFF;
 	#endif
 	
 	#ifdef BUFFERED
-	 ez8.adc0->ctl1.bufmode0=ON;
+	 ez8.adc->ctl1.bufmode0=ON;
 	#else 
-	 ez8.adc0->ctl1.bufmode0=OFF;
+	 ez8.adc->ctl1.bufmode0=OFF;
 	#endif
 	
 	#ifdef GAIN2X
-	 ez8.adc0->ctl1.bufmode1=ON;
+	 ez8.adc->ctl1.bufmode1=ON;
 	#else
-	 ez8.adc0->ctl1.bufmode1=OFF;
+	 ez8.adc->ctl1.bufmode1=OFF;
 	#endif 
 	
 	/* internal reference: {refselh,refsell}
@@ -43,29 +42,33 @@ void init_adc(void){
 	*/
 	#ifdef INTERNAL_REF
 	 if(INTERNAL_REF==1){
-		ez8.adc0->ctl0.refsell=ON; 
+		ez8.adc->ctl0.refsell=ON; 
 		}else if(INTERNAL_REF==2){
-			ez8.adc0->ctl1.refselh=ON;
-			ez8.adc0->ctl0.refsell=OFF;
+			ez8.adc->ctl1.refselh=ON;
+			ez8.adc->ctl0.refsell=OFF;
 			}else if(INTERNAL_REF==3){
-				ez8.adc0->ctl1.refselh=ON;
-				ez8.adc0->ctl0.refsell=ON;
+				ez8.adc->ctl1.refselh=ON;
+				ez8.adc->ctl0.refsell=ON;
 				}
-	 ez8.adc0->ctl0.refext=OFF; //no external ref, pin available for I/O	
+	 ez8.adc->ctl0.refext=OFF; //no external ref, pin available for I/O	
 	#else
-	 ez8.adc0->ctl1.refselh=OFF;
-	 ez8.adc0->ctl0.refsell=OFF;
-	 ez8.adc0->ctl0.refext=ON; //external reference to a pin	
+	 ez8.adc->ctl1.refselh=OFF;
+	 ez8.adc->ctl0.refsell=OFF;
+	 ez8.adc->ctl0.refext=ON; //external reference to a pin	
 	#endif
 	
  
 	/*Analog Input Select:ADCCTL0 ANAIN[3:0]*/
-	ez8.adc0->ctl0.anain =0x02; 	
+	ez8.adc->ctl0.anain = ana2; 	
 	//Continuous Conversion/Single shot Mode selection
 	#ifdef CONTINUOUS
-	ez8.adc0->ctl0.cont=ON; 	
+	ez8.adc->ctl0.cont=ON; 	
 	#endif 
-	ez8.adc0->ctl0.cen=ON;
+	ez8.adc->ctl0.cen=ON;
+}
+
+void select_input(char channel){
+	ez8.adc->ctl0.anain = channel; 
 }
 
 //software ADC calibration
@@ -86,12 +89,12 @@ void callibrate_adc (void){
 
 void read_adc(void){
 	#ifndef ADC_INTERRUPTS //blocking polled adc read
-	ez8.adc0->ctl0.cen=ON;
-	while(ez8.adc0->ctl0.cen==1){
+	ez8.adc->ctl0.cen=ON;
+	while(ez8.adc->ctl0.cen==1){
 		asm("nop");
 		}
-	VInHigh=ez8.adc0->datah.byte_reg;
-	VInLow=ez8.adc0->datal.byte_reg;
+	VInHigh=ez8.adc->datah.byte_reg;
+	VInLow=ez8.adc->datal.byte_reg;
 	ADC_data = (VInHigh <<8)| (VInLow); //ADC output word
 	ADC_data = (ADC_data >> 3) & 0xFFF;
 	ADC_compensated=(int)(ADC_data);
@@ -102,7 +105,7 @@ void read_adc(void){
 			ADC_compensated=(int)(ADC_data);
 			data_available=0;
 		}
-		ez8.adc0->ctl0.cen=ON;
+		ez8.adc->ctl0.cen=ON;
 	#endif
 }
 
